@@ -60,7 +60,15 @@ def transcribe_audio(audio_path: str, language: Optional[str]) -> str:
         print("❌ openai package not found. Install it with: pip3 install openai")
         sys.exit(1)
 
+    # Try Streamlit secrets first (when running on Streamlit Cloud),
+    # then fall back to .env / environment variable for local use
     api_key = os.environ.get("OPENAI_API_KEY")
+    try:
+        import streamlit as st
+        api_key = st.secrets.get("OPENAI_API_KEY", api_key)
+    except Exception:
+        pass
+
     if not api_key:
         print("❌ OPENAI_API_KEY not found.")
         print("   Copy .env.example to .env and add your key there.")
